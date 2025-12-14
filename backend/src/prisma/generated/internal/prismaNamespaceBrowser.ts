@@ -52,7 +52,9 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   User: 'User',
-  Bookmark: 'Bookmark'
+  Role: 'Role',
+  Route: 'Route',
+  RoleRoute: 'RoleRoute'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -70,28 +72,55 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 
 export const UserScalarFieldEnum = {
   id: 'id',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  deletedAt: 'deletedAt',
   email: 'email',
   password: 'password',
   firstName: 'firstName',
-  lastName: 'lastName'
+  lastName: 'lastName',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt',
+  roleId: 'roleId'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
-export const BookmarkScalarFieldEnum = {
+export const RoleScalarFieldEnum = {
   id: 'id',
-  createAt: 'createAt',
-  updateAt: 'updateAt',
+  name: 'name',
   title: 'title',
   description: 'description',
-  link: 'link'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
 } as const
 
-export type BookmarkScalarFieldEnum = (typeof BookmarkScalarFieldEnum)[keyof typeof BookmarkScalarFieldEnum]
+export type RoleScalarFieldEnum = (typeof RoleScalarFieldEnum)[keyof typeof RoleScalarFieldEnum]
+
+
+export const RouteScalarFieldEnum = {
+  id: 'id',
+  path: 'path',
+  method: 'method',
+  description: 'description',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type RouteScalarFieldEnum = (typeof RouteScalarFieldEnum)[keyof typeof RouteScalarFieldEnum]
+
+
+export const RoleRouteScalarFieldEnum = {
+  id: 'id',
+  roleId: 'roleId',
+  routeId: 'routeId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type RoleRouteScalarFieldEnum = (typeof RoleRouteScalarFieldEnum)[keyof typeof RoleRouteScalarFieldEnum]
 
 
 export const SortOrder = {
