@@ -7,6 +7,17 @@ export enum Errors {
   INVALID_CREDENTIALS,
   USER_DELETED,
   UNAUTHORIZED,
+
+  // role & access control
+  ROLE_EXISTS,
+  ROLE_NOT_FOUND,
+  ROUTE_NOT_FOUND,
+  ROLE_ROUTE_EXISTS,
+  FORBIDDEN_OPERATION,
+  ROLE_HAS_USERS,
+
+  ROUTE_EXISTS,
+
   UNKNOWN,
   BAD_REQUEST,
 }
@@ -18,6 +29,16 @@ export const ErrorMap: Record<Errors, string> = {
   [Errors.INVALID_CREDENTIALS]: 'ایمیل یا رمز عبور اشتباه است',
   [Errors.USER_DELETED]: 'این کاربر حذف شده است',
   [Errors.UNAUTHORIZED]: 'دسترسی غیرمجاز',
+
+  // role & access control
+  [Errors.ROLE_EXISTS]: 'این نقش از قبل وجود دارد',
+  [Errors.ROLE_NOT_FOUND]: 'نقش مورد نظر یافت نشد',
+  [Errors.ROUTE_NOT_FOUND]: 'مسیر مورد نظر یافت نشد',
+  [Errors.ROLE_ROUTE_EXISTS]: 'این مسیر قبلاً به نقش اختصاص داده شده است',
+  [Errors.FORBIDDEN_OPERATION]: 'انجام این عملیات مجاز نیست',
+  [Errors.ROLE_HAS_USERS]: 'این نقش به یک یا چند کاربر اختصاص داده شده است', // <-- Persian message
+
+  [Errors.ROUTE_EXISTS]: 'این مسیر از قبل وجود دارد',
   [Errors.UNKNOWN]: 'خطای داخلی',
   [Errors.BAD_REQUEST]: 'درخواست نامعتبر است',
 };
@@ -29,8 +50,18 @@ export const ErrorStatusCodeMap: Record<Errors, number> = {
   [Errors.INVALID_CREDENTIALS]: HttpStatus.UNAUTHORIZED,
   [Errors.USER_DELETED]: HttpStatus.GONE,
   [Errors.UNAUTHORIZED]: HttpStatus.FORBIDDEN,
-  [Errors.UNKNOWN]: HttpStatus.INTERNAL_SERVER_ERROR,
+
+  // role & access control
+  [Errors.ROLE_EXISTS]: HttpStatus.CONFLICT,
+  [Errors.ROLE_NOT_FOUND]: HttpStatus.NOT_FOUND,
+  [Errors.ROUTE_NOT_FOUND]: HttpStatus.NOT_FOUND,
+  [Errors.ROLE_ROUTE_EXISTS]: HttpStatus.CONFLICT,
+  [Errors.FORBIDDEN_OPERATION]: HttpStatus.FORBIDDEN,
+  [Errors.ROLE_HAS_USERS]: HttpStatus.FORBIDDEN,
+
+  [Errors.ROUTE_EXISTS]: HttpStatus.CONFLICT,
   [Errors.BAD_REQUEST]: HttpStatus.BAD_REQUEST,
+  [Errors.UNKNOWN]: HttpStatus.INTERNAL_SERVER_ERROR,
 };
 
 export class AppError {

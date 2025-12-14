@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { AppError } from 'src/constants/errors';
+import { AppResult } from './app-result.dto';
 
 export class ApiResponseDto<T> {
   @ApiProperty({ description: 'Indicates if the request was successful' })
@@ -22,5 +23,13 @@ export class ApiResponseDto<T> {
     this.success = success;
     this.data = data;
     this.error = error;
+  }
+
+  static fromAppResult<T>(result: AppResult<T>): ApiResponseDto<T> {
+    return {
+      success: result.success,
+      data: result.success ? result.data : (null as T),
+      error: result.success ? null : result.error,
+    };
   }
 }
