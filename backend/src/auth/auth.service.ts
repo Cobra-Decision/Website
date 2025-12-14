@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { UserCreateDto, UserResponseDto } from 'src/user/dto';
+import { UserResponseDto } from 'src/user/dto';
 import { UserService } from 'src/user/user.service';
 import { LoginDto } from './dto/login.dto';
 import { AppResult } from 'src/shared/dto/app-result.dto';
 import { appError, Errors } from 'src/constants/errors';
 import argon from 'argon2';
 import { JwtService } from '@nestjs/jwt';
+import { SignupDto } from './dto/signup.dto';
 
 @Injectable()
 export class AuthService {
@@ -14,9 +15,12 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signup(input: UserCreateDto): Promise<AppResult<UserResponseDto>> {
+  async signup(input: SignupDto): Promise<AppResult<UserResponseDto>> {
     try {
-      const created = await this.userService.createUser(input);
+      const created = await this.userService.createUser({
+        ...input,
+        roleId: 1, // simple user
+      });
       return created;
     } catch (err: any) {
       return {
