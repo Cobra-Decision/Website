@@ -10,7 +10,8 @@ export const UserMapper = {
       firstName: user.firstName,
       lastName: user.lastName,
       createdAt: user.createdAt,
-      updateAt: user.updatedAt,
+      updatedAt: user.updatedAt,
+      roleId: user.roleId,
     };
   },
 
@@ -23,6 +24,7 @@ export const UserMapper = {
       createdAt: new Date(),
       updatedAt: new Date(),
       deletedAt: null,
+      role: { connect: { id: dto.roleId } },
     };
   },
 };
