@@ -14,7 +14,6 @@ Make sure you have **Bun** installed.
 curl -fsSL https://bun.sh/install | bash
 ```
 
-````
 
 Check installation:
 
@@ -96,4 +95,3 @@ This allows you to view and edit database records in the browser.
 
 ---
 
-````
