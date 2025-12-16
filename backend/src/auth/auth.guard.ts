@@ -10,7 +10,7 @@ import { appError, Errors } from 'src/constants/errors';
 import { UserResponseDto } from 'src/user/dto';
 
 @Injectable()
-export class AuthGuard implements CanActivate {
+export class JwtAuthGuard implements CanActivate {
   constructor(private jwtService: JwtService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {

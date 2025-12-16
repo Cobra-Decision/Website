@@ -28,6 +28,12 @@ export class UserResponseDto {
   lastName: string | null;
 
   @ApiProperty({
+    description: 'Unique identifier of the role id',
+    example: '1',
+  })
+  roleId: number;
+
+  @ApiProperty({
     description: 'Date and time when the user was created',
     example: '2025-12-04T12:34:56.789Z',
   })
@@ -37,5 +43,5 @@ export class UserResponseDto {
     description: 'Date and time when the user was last updated',
     example: '2025-12-04T12:34:56.789Z',
   })
-  updateAt: Date;
+  updatedAt: Date;
 }

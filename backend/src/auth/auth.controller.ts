@@ -7,7 +7,7 @@ import {
   Res,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { UserCreateDto, UserResponseDto } from 'src/user/dto';
+import { UserResponseDto } from 'src/user/dto';
 import { ApiResponseDto } from 'src/shared/dto/api-response.dto';
 import { LoginDto } from './dto/login.dto';
 import {
@@ -15,10 +15,11 @@ import {
   ApiTags,
   ApiResponse,
   ApiExtraModels,
-  getSchemaPath,
 } from '@nestjs/swagger';
 import { AppError } from 'src/constants/errors';
+import { ApiResponseSchema } from 'src/shared/helpers/swagger-response.helper';
 import type { Response } from 'express';
+import { SignupDto } from './dto/signup.dto';
 
 @ApiTags('auth')
 @ApiExtraModels(ApiResponseDto, UserResponseDto, AppError)
@@ -32,26 +33,19 @@ export class AuthController {
   @ApiResponse({
     status: 201,
     description: 'User successfully created',
-    schema: {
-      allOf: [
-        { $ref: getSchemaPath(ApiResponseDto) },
-        {
-          properties: {
-            data: { $ref: getSchemaPath(UserResponseDto) },
-            error: { $ref: getSchemaPath(AppError) },
-          },
-        },
-      ],
-    },
+    schema: ApiResponseSchema(UserResponseDto),
   })
   async signup(
-    @Body() dto: UserCreateDto,
+    @Body() dto: SignupDto,
   ): Promise<ApiResponseDto<UserResponseDto>> {
     const result = await this.authService.signup(dto);
     if (!result.success) {
-      throw new HttpException(result.error, result.error.statusCode);
+      throw new HttpException(
+        ApiResponseDto.fromAppResult(result),
+        result.error.statusCode,
+      );
     }
-    return { success: true, error: null, data: result.data };
+    return new ApiResponseDto(true, result.data, null);
   }
 
   @Post('login')
@@ -60,17 +54,7 @@ export class AuthController {
   @ApiResponse({
     status: 200,
     description: 'User successfully logged in',
-    schema: {
-      allOf: [
-        { $ref: getSchemaPath(ApiResponseDto) },
-        {
-          properties: {
-            data: { $ref: getSchemaPath(UserResponseDto) },
-            error: { $ref: getSchemaPath(AppError) },
-          },
-        },
-      ],
-    },
+    schema: ApiResponseSchema(UserResponseDto),
   })
   async login(
     @Body() dto: LoginDto,
@@ -78,16 +62,21 @@ export class AuthController {
   ): Promise<ApiResponseDto<UserResponseDto>> {
     const result = await this.authService.login(dto);
     if (!result.success) {
-      throw new HttpException(result.error, result.error.statusCode);
+      throw new HttpException(
+        ApiResponseDto.fromAppResult(result),
+        result.error.statusCode,
+      );
     }
+
     const { token, ...user } = result.data;
+
     res.cookie('token', token, {
       httpOnly: true,
-      secure: false, // HTTPS
+      secure: false, // set to true in production with HTTPS
       sameSite: 'lax',
       maxAge: 1000 * 60 * 60, // 1 hour
     });
 
-    return { success: true, error: null, data: user };
+    return new ApiResponseDto(true, user, null);
   }
 }

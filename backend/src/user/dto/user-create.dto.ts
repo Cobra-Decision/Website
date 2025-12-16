@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class UserCreateDto {
   @ApiProperty({
@@ -17,4 +17,7 @@ export class UserCreateDto {
   @IsString({ message: 'رمز عبور باید رشته باشد' })
   @IsNotEmpty({ message: 'وارد کردن رمز عبور الزامی است' })
   password: string;
+
+  @IsNumber({}, { message: 'نقش  وارد شده معتبر نیست' })
+  roleId: number;
 }
