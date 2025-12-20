@@ -1,0 +1,79 @@
+<div class="flex items-center flex-col w-full">
+  <div class="hero bg-base-100 w-full min-h-screen">
+    <div class="hero-content flex-col lg:flex-row-reverse">
+      <div class="">
+        <img src="/images/heroImage.png" alt="Hero Image" class="w-full" />
+      </div>
+      <div class="flex flex-col">
+        <h1 class="text-5xl font-bold text-center text-nowrap">{{ heroTitle }}</h1>
+        <p class="py-6">
+          {{ heroDescription }}
+        </p>
+        <div class="flex flex-row justify-center gap-4">
+          <button class="btn btn-primary">{{ signupButtonText }}</button>
+          <button class="btn btn-neutral">{{ loginButtonText }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="stats bg-base-200 text-neutral-content rounded-none w-full flex justify-center items-center stats-vertical lg:stats-horizontal shadow"
+  >
+    <div class="stat flex flex-col justify-center items-center">
+      <div class="stat-title">تعداد گفتگو برگزار شده</div>
+      <div class="stat-value">31K</div>
+      <div class="stat-desc"></div>
+    </div>
+
+    <div class="stat flex flex-col justify-center items-center">
+      <div class="stat-title">زمان برگزار گفتگو</div>
+      <div class="stat-value">چارشنبه‌ها</div>
+      <div class="stat-desc">ساعت ۱۹</div>
+    </div>
+
+    <div class="stat flex flex-col justify-center items-center">
+      <div class="stat-title">تعداد ساعت گفتگو</div>
+      <div class="stat-value">4,200 ساعت</div>
+    </div>
+  </div>
+
+  <div class="card mt-10 bg-base-300 w-96">
+    <figure>
+      <img src="images/meetPic.jpg" alt="Meeting" />
+    </figure>
+    <div class="card-body items-center text-center">
+      <p class="pb-2">
+        این گفتگو برای ماشین های مختلف در ساعت ۱۹ شب برگزار خواهد شد. اگر در ساعت ۱۹ شب هیچ گفتگوی
+        نداشته باشید،
+      </p>
+      <div class="card-actions justify-end">
+        <button class="btn btn-primary">ثبت نام</button>
+        <button class="btn btn-primary">درباره گفتگو</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="carousel w-full">
+    <div id="slide1" class="carousel-item relative w-full">
+      <img
+        src="https://img.daisyui.com/images/stock/photo-1625726411847-8cbb60cc71e6.webp"
+        class="w-full"
+      />
+      <div class="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between">
+        <a href="#slide4" class="btn btn-circle">❮</a>
+        <a href="#slide2" class="btn btn-circle">❯</a>
+      </div>
+    </div>
+    <div id="slide2" class="carousel-item relative w-full">
+      <img
+        src="https://img.daisyui.com/images/stock/photo-1609621838510-5ad474b7d25d.webp"
+        class="w-full"
+      />
+      <div class="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between">
+        <a href="#slide1" class="btn btn-circle">❮</a>
+        <a href="#slide3" class="btn btn-circle">❯</a>
+      </div>
+    </div>
+  </div>
+</div>
