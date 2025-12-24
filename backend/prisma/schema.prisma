@@ -14,61 +14,188 @@ datasource db {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  email     String    @unique
+  id        Int     @id @default(autoincrement())
+  email     String  @unique
+  phone     String? @unique
   password  String
   firstName String?
   lastName  String?
+
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
-  // Relation
+  // Role
   roleId Int
   role   Role @relation(fields: [roleId], references: [id])
+
+  // Gender
+  genderId Int?
+  gender   Gender? @relation(fields: [genderId], references: [id])
+
+  // Statuses
+  userStatusId Int?
+  userStatus   Status? @relation("UserStatus", fields: [userStatusId], references: [id])
+
+  userLoginStatusId Int?
+  userLoginStatus   Status? @relation("UserLoginStatus", fields: [userLoginStatusId], references: [id])
+
+  // Relations
+  meetings         Meeting[]         @relation("PresenterMeetings")
+  meetingAttendees MeetingAttendee[]
+  userTagRelations UserTagRelation[]
+  userLinks        UserLink[]
 }
 
 model Role {
-  id          Int    @id @default(autoincrement())
-  name        String @unique
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
   title       String
-  description String
+  description String?
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
-  // Relations
   users  User[]
   routes RoleRoute[]
 }
 
 model Route {
-  id          Int       @id @default(autoincrement())
+  id          Int     @id @default(autoincrement())
   path        String
-  method      String // GET, POST, PUT, DELETE, etc.
-  description String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  deletedAt   DateTime?
+  method      String
+  description String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   roles RoleRoute[]
 
   @@unique([path, method], name: "path_method")
 }
 
-// Join table for Many-to-Many relation between Role and Routes
 model RoleRoute {
   id      Int @id @default(autoincrement())
   roleId  Int
   routeId Int
 
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
   role  Role  @relation(fields: [roleId], references: [id])
   route Route @relation(fields: [routeId], references: [id])
+
+  @@unique([roleId, routeId])
+}
+
+model Gender {
+  id    Int    @id @default(autoincrement())
+  text  String @unique
+  title String
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
-  @@unique([roleId, routeId])
+  users User[]
+}
+
+model Status {
+  id          Int     @id @default(autoincrement())
+  text        String  @unique
+  title       String
+  description String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  // Explicit relations
+  users            User[]            @relation("UserStatus")
+  loginUsers       User[]            @relation("UserLoginStatus")
+  meetings         Meeting[]
+  meetingAttendees MeetingAttendee[] @relation("AttendeeStatus")
+}
+
+model Meeting {
+  id          Int     @id @default(autoincrement())
+  title       String
+  description String?
+
+  presenterId Int?
+  presenter   User? @relation("PresenterMeetings", fields: [presenterId], references: [id])
+
+  meetingDate DateTime
+  meetingTime DateTime
+  duration    String
+
+  imageUrl   String  @unique
+  videoUrl   String? @unique
+  meetingUrl String  @unique
+
+  meetingStatusId Int
+  meetingStatus   Status @relation(fields: [meetingStatusId], references: [id])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  attendees MeetingAttendee[]
+}
+
+model MeetingAttendee {
+  id        Int @id @default(autoincrement())
+  meetingId Int
+  userId    Int
+
+  attendeeStatusId Int
+  attendeeStatus   Status @relation("AttendeeStatus", fields: [attendeeStatusId], references: [id])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  meeting Meeting @relation(fields: [meetingId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+
+  @@unique([meetingId, userId])
+}
+
+model Tag {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  title String
+
+  createdAt DateTime  @default(now())
+  deletedAt DateTime?
+
+  users UserTagRelation[]
+}
+
+model UserTagRelation {
+  id     Int @id @default(autoincrement())
+  userId Int
+  tagId  Int
+
+  createdAt DateTime  @default(now())
+  deletedAt DateTime?
+
+  user User @relation(fields: [userId], references: [id])
+  tag  Tag  @relation(fields: [tagId], references: [id])
+
+  @@unique([userId, tagId])
+}
+
+model UserLink {
+  id     Int    @id @default(autoincrement())
+  title  String
+  userId Int
+
+  createdAt DateTime  @default(now())
+  deletedAt DateTime?
+
+  user User @relation(fields: [userId], references: [id])
 }
