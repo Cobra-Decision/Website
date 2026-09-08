@@ -10,7 +10,7 @@ export const Landing = ({ data, locale = "en" }: { data: LandingCache; locale?: 
   const featured = data.meets[0];
   const totalUsersFormatted = formatLocalizedNumber(data.totalUsers, locale);
   const totalHoursFormatted = formatLocalizedNumber(data.totalMeetHours, locale);
-  const totalMeetsFormatted = formatLocalizedNumber(data.meets.length, locale);
+  const totalMeetsFormatted = formatLocalizedNumber(data.totalMeets, locale);
 
   return (
     <div class="overflow-x-hidden bg-base-100 min-h-screen">
@@ -73,11 +73,15 @@ export const Landing = ({ data, locale = "en" }: { data: LandingCache; locale?: 
         <section class="border-b border-base-200 bg-base-100 py-10">
           <div class="mx-auto max-w-7xl px-5 sm:px-8">
             <div class="flex flex-wrap items-center justify-center gap-8 text-center sm:gap-16">
-              <div class="px-4">
-                <p class="text-sm font-medium text-base-content/60">{t("stats.members", locale)}</p>
-                <p class="mt-1 text-3xl font-extrabold text-primary sm:text-4xl">{totalUsersFormatted}</p>
-              </div>
-              <div class="h-10 w-px bg-base-300 hidden sm:block"></div>
+              {data.totalUsers >= 50 && (
+                <>
+                  <div class="px-4">
+                    <p class="text-sm font-medium text-base-content/60">{t("stats.members", locale)}</p>
+                    <p class="mt-1 text-3xl font-extrabold text-primary sm:text-4xl">{totalUsersFormatted}</p>
+                  </div>
+                  <div class="h-10 w-px bg-base-300 hidden sm:block"></div>
+                </>
+              )}
               <div class="px-4">
                 <p class="text-sm font-medium text-base-content/60">{t("stats.hours", locale)}</p>
                 <p class="mt-1 text-3xl font-extrabold text-primary sm:text-4xl">{totalHoursFormatted}</p>

@@ -28,18 +28,28 @@ test("startup cache stores user statistics and active upcoming meets", async () 
   createMeet(database, { title: "Bun meetup", topics: ["Bun"], scheduledDate: "2099-01-01", scheduledTime: "18:00", durationMinutes: 90, imageUrl: "https://example.com/poster.jpg", tagIds: [] });
 
   initCache(database);
-  expect(getLandingCache()).toMatchObject({ totalUsers: 1, totalMeetHours: 2, meets: [{ title: "Bun meetup" }] });
+  expect(getLandingCache()).toMatchObject({ totalUsers: 1, totalMeetHours: 2, totalMeets: 1, meets: [{ title: "Bun meetup" }] });
 });
 
-test("landing renders cached content and contact endpoint persists valid emails", async () => {
+test("landing renders cached content, hides user stats under 50, and contact endpoint persists valid emails", async () => {
   initCache(database);
   const page = await app.request("/");
   const html = await page.text();
-  expect(html).toContain("Community members");
+  expect(html).not.toContain("Community members");
   expect(html).toContain('hx-post="/api/contact"');
   expect(html).toContain("scroll-smooth");
   expect(html).toContain("Featured conversations");
   expect(html).toContain("No upcoming meets yet.");
+
+  // If 50+ users exist, it should render Community members
+  const role = database.query<{ id: string }, []>("SELECT id FROM roles WHERE title = 'member'").get()!;
+  for (let i = 0; i < 50; i++) {
+    database.run("INSERT INTO users (id, email, password_hash, role_id) VALUES (?, ?, ?, ?)", [generateId(), `user${i}@example.com`, "hash", role.id]);
+  }
+  initCache(database);
+  const pageWithUsers = await app.request("/");
+  const htmlWithUsers = await pageWithUsers.text();
+  expect(htmlWithUsers).toContain("Community members");
 
   const form = new FormData();
   form.set("email", "hello@example.com");
