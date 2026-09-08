@@ -18,6 +18,35 @@ async function setupTestApp() {
   const db = new Database(":memory:");
   await runMigrations(db);
   await seedFull(db);
+
+  // For permissions test suite, manually assign admin & member endpoints to test permission enforcement
+  const adminRole = db.query<{ id: string }, []>("SELECT id FROM roles WHERE title = 'admin'").get()!;
+  const memberRole = db.query<{ id: string }, []>("SELECT id FROM roles WHERE title = 'member'").get()!;
+  const allEndpoints = db.query<{ id: string; title: string }, []>("SELECT id, title FROM endpoints").all();
+
+  for (const ep of allEndpoints) {
+    if (ep.title === "/dashboard/admin/report") continue;
+    db.run("INSERT OR IGNORE INTO role_endpoints (id, role_id, endpoint_id, description) VALUES (?, ?, ?, ?)", [
+      `re-${adminRole.id}-${ep.id}`,
+      adminRole.id,
+      ep.id,
+      "Admin access",
+    ]);
+  }
+
+  const memberEndpoints = ["/dashboard", "/dashboard/user", "/dashboard/user/meets", "/dashboard/user/my-meets", "/dashboard/account"];
+  for (const path of memberEndpoints) {
+    const ep = db.query<{ id: string }, [string]>("SELECT id FROM endpoints WHERE title = ?").get(path);
+    if (ep) {
+      db.run("INSERT OR IGNORE INTO role_endpoints (id, role_id, endpoint_id, description) VALUES (?, ?, ?, ?)", [
+        `re-${memberRole.id}-${ep.id}`,
+        memberRole.id,
+        ep.id,
+        "Member access",
+      ]);
+    }
+  }
+
   clearPermissionCache();
 
   const dummyCaptcha = {

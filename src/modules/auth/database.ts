@@ -132,33 +132,6 @@ export async function initializeDatabase(database: Database, admin: AdminSeed = 
     }
   }
 
-  const adminRoles = database.query<{ id: string; title: string }, []>("SELECT id, title FROM roles WHERE title IN ('admin', 'Super Admin')").all();
-  const allEndpoints = database.query<{ id: string; title: string }, []>("SELECT id, title FROM endpoints").all();
-
-  for (const r of adminRoles) {
-    for (const e of allEndpoints) {
-      if (r.title === "admin" && e.title === "/dashboard/admin/report") continue;
-      database.run(
-        "INSERT OR IGNORE INTO role_endpoints (id, role_id, endpoint_id, description) VALUES (?, ?, ?, ?)",
-        [generateId(), r.id, e.id, "Dashboard access"]
-      );
-    }
-  }
-
-  const memberRole = database.query<{ id: string }, [string]>("SELECT id FROM roles WHERE title = ?").get("member");
-  if (memberRole) {
-    const memberEndpoints = ["/dashboard", "/dashboard/user", "/dashboard/user/meets", "/dashboard/user/my-meets", "/dashboard/account"];
-    for (const path of memberEndpoints) {
-      const ep = database.query<{ id: string }, [string]>("SELECT id FROM endpoints WHERE title = ?").get(path);
-      if (ep) {
-        database.run(
-          "INSERT OR IGNORE INTO role_endpoints (id, role_id, endpoint_id, description) VALUES (?, ?, ?, ?)",
-          [generateId(), memberRole.id, ep.id, "Member dashboard access"]
-        );
-      }
-    }
-  }
-
   const errorMessages = [
     ["success", "admin.created", "Record created."],
     ["success", "admin.deleted", "Record deleted."],

@@ -159,8 +159,7 @@ export const SYSTEM_ENDPOINTS = [
 
 export async function seedEndpoints(
   db: Database,
-  report: SeedReport = {},
-  options: { bindRoles?: boolean } = { bindRoles: false }
+  report: SeedReport = {}
 ): Promise<SeedReport> {
   // Ensure roles exist first
   await seedRoles(db, report);
@@ -173,62 +172,8 @@ export async function seedEndpoints(
       const endpointId = generateId();
       db.run("INSERT INTO endpoints (id, title, description) VALUES (?, ?, ?)", [endpointId, endpoint, "System endpoint"]);
       addReport(report, "endpoints", "endpoints", 1, 0, 0);
-
-      // Auto-bind new admin endpoints to Super Admin & admin roles so existing deployments get permission immediately
-      const adminRoles = db.query<{ id: string; title: string }, []>(
-        "SELECT id, title FROM roles WHERE title IN ('admin', 'Super Admin')"
-      ).all();
-      for (const r of adminRoles) {
-        if (r.title === "admin" && endpoint === "/dashboard/admin/report") continue;
-        db.run(
-          "INSERT OR IGNORE INTO role_endpoints (id, role_id, endpoint_id, description) VALUES (?, ?, ?, ?)",
-          [generateId(), r.id, endpointId, "Dashboard access"]
-        );
-      }
     } else {
       addReport(report, "endpoints", "endpoints", 0, 0, 1);
-    }
-  }
-
-  // Only bind role endpoints if explicitly requested or if role has 0 endpoints bound
-  if (options.bindRoles) {
-    const adminRoles = db.query<{ id: string; title: string }, []>("SELECT id, title FROM roles WHERE title IN ('admin', 'Super Admin')").all();
-    const allEndpoints = db.query<{ id: string; title: string }, []>("SELECT id, title FROM endpoints").all();
-
-    for (const r of adminRoles) {
-      for (const e of allEndpoints) {
-        if (r.title === "admin" && e.title === "/dashboard/admin/report") continue;
-        const existing = db.query<{ id: string }, [string, string]>("SELECT id FROM role_endpoints WHERE role_id = ? AND endpoint_id = ?").get(r.id, e.id);
-        if (!existing) {
-          db.run(
-            "INSERT OR IGNORE INTO role_endpoints (id, role_id, endpoint_id, description) VALUES (?, ?, ?, ?)",
-            [generateId(), r.id, e.id, "Dashboard access"]
-          );
-          addReport(report, "endpoints", "role_endpoints", 1, 0, 0);
-        } else {
-          addReport(report, "endpoints", "role_endpoints", 0, 0, 1);
-        }
-      }
-    }
-
-    const memberRole = db.query<{ id: string }, [string]>("SELECT id FROM roles WHERE title = ?").get("member");
-    if (memberRole) {
-      const memberEndpoints = ["/dashboard", "/dashboard/user", "/dashboard/user/meets", "/dashboard/user/my-meets", "/dashboard/account"];
-      for (const path of memberEndpoints) {
-        const ep = db.query<{ id: string }, [string]>("SELECT id FROM endpoints WHERE title = ?").get(path);
-        if (ep) {
-          const existing = db.query<{ id: string }, [string, string]>("SELECT id FROM role_endpoints WHERE role_id = ? AND endpoint_id = ?").get(memberRole.id, ep.id);
-          if (!existing) {
-            db.run(
-              "INSERT OR IGNORE INTO role_endpoints (id, role_id, endpoint_id, description) VALUES (?, ?, ?, ?)",
-              [generateId(), memberRole.id, ep.id, "Member dashboard access"]
-            );
-            addReport(report, "endpoints", "role_endpoints", 1, 0, 0);
-          } else {
-            addReport(report, "endpoints", "role_endpoints", 0, 0, 1);
-          }
-        }
-      }
     }
   }
 
@@ -520,7 +465,7 @@ export async function seedMailer(db: Database, report: SeedReport = {}): Promise
 export async function seedFull(db: Database): Promise<SeedReport> {
   const report: SeedReport = {};
   await seedRoles(db, report);
-  await seedEndpoints(db, report, { bindRoles: true });
+  await seedEndpoints(db, report);
   await seedTags(db, report);
   await seedUsers(db, report);
   await seedMeets(db, report);

@@ -53,6 +53,8 @@ test("permission checker ignores soft-deleted permissions and can clear its cach
   const database = new Database(":memory:");
   await initializeDatabase(database);
   const admin = database.query<{ id: string }, []>("SELECT id FROM roles WHERE title = 'admin' AND deleted_at IS NULL").get()!;
+  const ep = database.query<{ id: string }, []>("SELECT id FROM endpoints WHERE title = '/dashboard'").get()!;
+  database.run("INSERT INTO role_endpoints (id, role_id, endpoint_id, description) VALUES ('re-1', ?, ?, 'test')", [admin.id, ep.id]);
   const canAccess = createPermissionChecker(database);
   expect(canAccess(admin.id, "/dashboard")).toBe(true);
   database.run("UPDATE role_endpoints SET deleted_at = CURRENT_TIMESTAMP");

@@ -10,7 +10,7 @@ describe("Warehouse Center - Platforms Data & Funnel Analytics", () => {
     const db = new Database(":memory:");
     await runMigrations(db);
     await seedRoles(db);
-    await seedEndpoints(db, {}, { bindRoles: true });
+    await seedEndpoints(db);
 
     // Seed platform and meets
     db.run("INSERT INTO platforms (id, slug, name) VALUES ('p-tg', 'telegram', 'Telegram Channel')");

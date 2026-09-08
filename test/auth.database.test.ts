@@ -6,7 +6,7 @@ import { generateId } from "../src/lib/id";
 let database: Database;
 afterEach(() => database?.close());
 
-test("initialization seeds roles and dashboard permission once", async () => {
+test("initialization seeds roles and endpoints once without forcing role_endpoints bindings", async () => {
   database = new Database(":memory:");
   await initializeDatabase(database);
   await initializeDatabase(database);
@@ -17,7 +17,7 @@ test("initialization seeds roles and dashboard permission once", async () => {
     { title: "member" },
   ]);
   expect(database.query("SELECT title FROM endpoints WHERE deleted_at IS NULL").all().length).toBeGreaterThanOrEqual(8);
-  expect((database.query<{ total: number }, []>("SELECT COUNT(*) total FROM role_endpoints WHERE deleted_at IS NULL").get()!).total).toBeGreaterThanOrEqual(15);
+  expect((database.query<{ total: number }, []>("SELECT COUNT(*) total FROM role_endpoints WHERE deleted_at IS NULL").get()!).total).toBe(0);
 });
 
 test("optional admin seed is idempotent and uses a native password hash", async () => {

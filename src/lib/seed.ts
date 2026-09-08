@@ -23,7 +23,7 @@ export async function seedSampleData(database: Database) {
 
   const maya = await ensureUser("maya@example.com", "maya", "Maya", "Chen", "+989121112233");
   const noah = await ensureUser("noah@example.com", "noah", "Noah", "Patel", "+14155552671");
-  await ensureUser("alex.admin@example.com", "alex-admin", "Alex", "Morgan", "+447911123456", roles.admin);
+  await ensureUser("alex.admin@example.com", "alex-admin", "Alex", "Morgan", "+447911123456", roles["Super Admin"] ?? roles.admin);
 
   // Register all system endpoints
   const endpointsToRegister = [
@@ -140,35 +140,6 @@ export async function seedSampleData(database: Database) {
         endpoint,
         "System endpoint",
       ]);
-    }
-  }
-
-  // Map permissions for Super Admin and Admin
-  const adminRoles = database.query<{ id: string; title: string }, []>("SELECT id, title FROM roles WHERE title IN ('admin', 'Super Admin')").all();
-  const allEndpoints = database.query<{ id: string; title: string }, []>("SELECT id, title FROM endpoints").all();
-
-  for (const r of adminRoles) {
-    for (const e of allEndpoints) {
-      if (r.title === "admin" && e.title === "/dashboard/admin/report") continue;
-      database.run(
-        "INSERT OR IGNORE INTO role_endpoints (id, role_id, endpoint_id, description) VALUES (?, ?, ?, ?)",
-        [generateId(), r.id, e.id, "Dashboard access"]
-      );
-    }
-  }
-
-  // Member role endpoints
-  const memberRole = database.query<{ id: string }, [string]>("SELECT id FROM roles WHERE title = ?").get("member");
-  if (memberRole) {
-    const memberEndpoints = ["/dashboard", "/dashboard/user", "/dashboard/user/meets", "/dashboard/user/my-meets", "/dashboard/account"];
-    for (const path of memberEndpoints) {
-      const ep = database.query<{ id: string }, [string]>("SELECT id FROM endpoints WHERE title = ?").get(path);
-      if (ep) {
-        database.run(
-          "INSERT OR IGNORE INTO role_endpoints (id, role_id, endpoint_id, description) VALUES (?, ?, ?, ?)",
-          [generateId(), memberRole.id, ep.id, "Member dashboard access"]
-        );
-      }
     }
   }
 

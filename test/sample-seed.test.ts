@@ -18,7 +18,6 @@ test("sample seed creates related data once across all tables", async () => {
     "roles",
     "users",
     "endpoints",
-    "role_endpoints",
     "error_messages",
     "tags",
     "meets",
